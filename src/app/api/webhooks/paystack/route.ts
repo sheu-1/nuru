@@ -2,12 +2,13 @@ import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { sendOrderNotification } from "@/lib/notifications";
+import { getPaystackSecretKey } from "@/lib/paystack";
 
 export async function POST(req: Request) {
   try {
     const rawBody = await req.text();
     const signature = req.headers.get("x-paystack-signature");
-    const secretKey = process.env.PAYSTACK_SECRET_KEY;
+    const secretKey = getPaystackSecretKey();
 
     if (secretKey) {
       const hash = crypto

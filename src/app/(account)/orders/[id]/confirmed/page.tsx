@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ConfirmedPoller } from "./ConfirmedPoller";
+import { getPaystackSecretKey } from "@/lib/paystack";
 
 interface OrderDetail {
   id: string;
@@ -56,7 +57,7 @@ export default async function OrderConfirmedPage({
 
   // If redirected from Paystack with a reference and order is still pending, verify immediately
   const reference = resolvedSearchParams.reference;
-  const paystackKey = process.env.PAYSTACK_SECRET_KEY;
+  const paystackKey = getPaystackSecretKey();
 
   if (reference && paystackKey && (!order || order.status === "pending")) {
     try {

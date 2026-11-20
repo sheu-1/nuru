@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { sendOrderNotification } from "@/lib/notifications";
+import { getPaystackSecretKey } from "@/lib/paystack";
 
 const DELIVERY_KES = 0; // Set to 0 for testing (was 250)
 const DEFAULT_USER_PHONE = "0799608845";
@@ -108,11 +109,7 @@ export async function POST(req: Request) {
       status: "pending",
     }).catch(console.error);
 
-    const rawKey =
-      process.env.PAYSTACK_SECRET_KEY ||
-      process.env.EXPO_PUBLIC_PAYSTACK_SECRET_KEY ||
-      "";
-    const paystackKey = rawKey.trim().replace(/^["']|["']$/g, "");
+    const paystackKey = getPaystackSecretKey();
 
     // Dynamically derive siteUrl from request headers so wrong env vars never cause 404
     const originHeader = req.headers.get("origin");
@@ -140,16 +137,6 @@ export async function POST(req: Request) {
             "Configuration Error: A Public Key ('pk_...') was set for PAYSTACK_SECRET_KEY. In Vercel Environment Variables, set PAYSTACK_SECRET_KEY to your Secret Key (starts with 'sk_live_' or 'sk_test_').",
         },
         { status: 500 }
-      );
-    }
-
-    if (paystackKey.includes("REPLACE_WITH_YOUR_LIVE_SECRET_KEY")) {
-      return NextResponse.json(
-        {
-          error:
-            "Incomplete Paystack Setup: Please replace the placeholder PAYSTACK_SECRET_KEY in Vercel with your actual Secret Key (e.g. sk_test_17ff0ab99b62dae88fab936ca29c13ddaecc6fd7 or your sk_live_... key).",
-        },
-        { status: 400 }
       );
     }
 
