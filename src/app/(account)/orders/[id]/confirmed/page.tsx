@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ConfirmedPoller } from "./ConfirmedPoller";
@@ -73,12 +74,13 @@ export default async function OrderConfirmedPage({
       const verifyJson = await verifyRes.json();
 
       if (verifyJson.status && verifyJson.data?.status === "success") {
-        await supabase
+        const adminSb = createAdminClient();
+        await adminSb
           .from("orders")
           .update({ status: "paid" })
           .eq("id", id);
 
-        await supabase.from("payments").insert({
+        await adminSb.from("payments").insert({
           order_id: id,
           reference,
           amount_kes: Math.round(verifyJson.data.amount / 100),
@@ -88,7 +90,7 @@ export default async function OrderConfirmedPage({
           paid_at: verifyJson.data.paid_at || new Date().toISOString(),
         });
 
-        await supabase.from("cart_items").delete().eq("user_id", user.id);
+        await adminSb.from("cart_items").delete().eq("user_id", user.id);
 
         if (order) {
           order.status = "paid";

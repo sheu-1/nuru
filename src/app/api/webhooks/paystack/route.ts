@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { sendOrderNotification } from "@/lib/notifications";
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     }
 
     const data = event.data;
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // Call atomic fulfil_order database function
     const { error } = await supabase.rpc("fulfil_order", {
@@ -42,11 +42,14 @@ export async function POST(req: Request) {
 
     if (error) {
       // If RPC fails (e.g. not created yet), perform manual update
+      const metaOrderId = data.metadata?.order_id || "";
+      const searchId = metaOrderId || "00000000-0000-0000-0000-000000000000";
+
       const { data: order } = await supabase
         .from("orders")
         .select("id, user_id, total_kes, order_no, ship_name, ship_phone, ship_address, order_items(name, quantity, unit_price_kes)")
-        .eq("paystack_reference", data.reference)
-        .single();
+        .or(`paystack_reference.eq.${data.reference},id.eq.${searchId}`)
+        .maybeSingle();
 
       if (order) {
         await supabase
@@ -73,33 +76,7 @@ export async function POST(req: Request) {
           customerPhone: (order as any).ship_phone || "",
           customerAddress: (order as any).ship_address || "",
           items: ((order as any).order_items as any[]) || [],
-          totalKes: order.total_kes,
-          paystackReference: data.reference,
-          channel: data.channel,
-          status: "paid",
-        }).catch(console.error);
-      }
-    } else {
-      // RPC succeeded: fetch order details to send notification
-      const { data: order } = await supabase
-        .from("orders")
-        .select("id, order_no, total_kes, ship_name, ship_phone, ship_address, order_items(name, quantity, unit_price_kes)")
-        .eq("paystack_reference", data.reference)
-        .maybeSingle();
-
-      if (order) {
-        sendOrderNotification({
-          orderId: order.id,
-          orderNo: order.order_no,
-          customerName: order.ship_name || "Customer",
-          customerPhone: order.ship_phone || "",
-          customerAddress: order.ship_address || "",
-          items: ((order.order_items as any[]) || []).map((i) => ({
-            name: i.name,
-            quantity: i.quantity,
-            unit_price_kes: i.unit_price_kes,
-          })),
-          totalKes: order.total_kes,
+          totalKes: (order as any).total_kes,
           paystackReference: data.reference,
           channel: data.channel,
           status: "paid",
@@ -107,7 +84,7 @@ export async function POST(req: Request) {
       }
     }
 
-    return NextResponse.json({ status: "success" }, { status: 200 });
+    return NextResponse.json({ message: "Order fulfilled successfully" }, { status: 200 });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }

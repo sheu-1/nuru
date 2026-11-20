@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
 import { sendOrderNotification } from "@/lib/notifications";
 import { getPaystackSecretKey } from "@/lib/paystack";
@@ -35,13 +35,16 @@ export async function GET(req: Request) {
     const paystackData = verifyJson.data;
 
     if (paystackData.status === "success") {
-      const supabase = await createClient();
+      const supabase = createAdminClient();
 
-      // Find the order
+      // Find the order by reference, orderId, or metadata.order_id
+      const metaOrderId = paystackData.metadata?.order_id || "";
+      const searchId = orderId || metaOrderId || "00000000-0000-0000-0000-000000000000";
+
       const { data: order } = await supabase
         .from("orders")
         .select("id, user_id, order_no, status, total_kes, ship_name, ship_phone, ship_address, order_items(name, quantity, unit_price_kes)")
-        .or(`paystack_reference.eq.${reference},id.eq.${orderId || "00000000-0000-0000-0000-000000000000"}`)
+        .or(`paystack_reference.eq.${reference},id.eq.${searchId}`)
         .maybeSingle();
 
       if (order && order.status !== "paid") {

@@ -56,6 +56,32 @@ export function CheckoutForm({
     return () => clearTimeout(id);
   }, [step, countdown]);
 
+  // Active polling to check if M-Pesa payment has been approved
+  useEffect(() => {
+    if (step !== "mpesa_pending" || !orderRef) return;
+    let active = true;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(
+          `/api/checkout/verify?reference=${encodeURIComponent(orderRef)}&orderId=${encodeURIComponent(orderId)}`
+        );
+        const data = await res.json();
+        if (data.status === "paid" && active) {
+          clearInterval(interval);
+          window.location.href = `/orders/${orderId}/confirmed?reference=${orderRef}&method=mpesa`;
+        }
+      } catch {
+        // Continue polling
+      }
+    }, 2000);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
+  }, [step, orderRef, orderId]);
+
   function validate() {
     const e: Record<string, string> = {};
     if (!name || name.trim().length < 2) e.name = "Full name is required";
