@@ -100,7 +100,7 @@ export default async function CartPage() {
             </div>
 
             {/* Order summary sidebar */}
-            <SummaryCard subtotal={subtotal} delivery={250}>
+            <SummaryCard subtotal={subtotal} delivery={0}>
               <Link
                 href="/checkout"
                 className="h-14 rounded-full bg-brand text-white text-base font-semibold flex items-center justify-center hover:opacity-90 transition-opacity text-center shadow-sm"

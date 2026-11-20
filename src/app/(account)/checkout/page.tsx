@@ -80,7 +80,7 @@ export default async function CheckoutPage() {
           initialPhone={profile?.phone || ""}
           items={items}
           subtotal={subtotal}
-          delivery={250}
+          delivery={0}
         />
       </main>
     </div>

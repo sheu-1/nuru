@@ -28,7 +28,7 @@ export function CheckoutForm({
   initialPhone,
   items,
   subtotal,
-  delivery = 250,
+  delivery = 0,
 }: CheckoutFormProps) {
   const [name, setName] = useState(initialName);
   const [phone, setPhone] = useState(initialPhone || "0799608845");
@@ -347,7 +347,7 @@ export function CheckoutForm({
           ))}
           <div className="flex justify-between items-center">
             <span>Delivery</span>
-            <span>KES {delivery.toLocaleString()}</span>
+            <span>{delivery === 0 ? "FREE (Testing)" : `KES ${delivery.toLocaleString()}`}</span>
           </div>
           <div style={{ height: 1, background: "#C8C5BB", margin: "4px 0" }} />
           <div className="flex justify-between items-center" style={{ fontSize: "1.1rem", fontWeight: 700, color: "#100F09" }}>

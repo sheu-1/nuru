@@ -15,7 +15,7 @@ interface SummaryCardProps {
 
 export function SummaryCard({
   subtotal,
-  delivery = 250,
+  delivery = 0,
   items,
   children,
 }: SummaryCardProps) {
@@ -44,7 +44,7 @@ export function SummaryCard({
         )}
         <div className="flex justify-between items-center">
           <span>Delivery</span>
-          <span>KES {delivery.toLocaleString()}</span>
+          <span>{delivery === 0 ? "FREE (Testing)" : `KES ${delivery.toLocaleString()}`}</span>
         </div>
         <div className="h-px bg-line my-1" />
         <div className="flex justify-between items-center text-ink text-lg font-semibold">

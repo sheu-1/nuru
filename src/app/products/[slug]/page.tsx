@@ -25,7 +25,7 @@ const STATIC_PRODUCTS: Record<string, Product> = {
     slug: "smartphone",
     description:
       "6.7-inch Super AMOLED 120Hz display, triple 8K camera system, flagship processor, 5000mAh battery with 65W fast charging, 256GB storage.",
-    price_kes: 48000,
+    price_kes: 10,
     stock: 25,
     sizes: ["128GB", "256GB", "512GB"],
     tint: "sky",
@@ -38,7 +38,7 @@ const STATIC_PRODUCTS: Record<string, Product> = {
     slug: "smart-tv",
     description:
       "Ultra-slim 4K UHD smart television featuring self-lit OLED pixels, Dolby Vision IQ, Dolby Atmos sound, and hands-free voice assistant.",
-    price_kes: 68000,
+    price_kes: 10,
     stock: 12,
     sizes: ["50-inch", "55-inch", "65-inch"],
     tint: "sage",
@@ -51,7 +51,7 @@ const STATIC_PRODUCTS: Record<string, Product> = {
     slug: "bluetooth-speaker",
     description:
       "360-degree immersive acoustic bass, IPX7 rugged waterproof exterior, PartyBoost pairing, and up to 20 hours battery life.",
-    price_kes: 6500,
+    price_kes: 10,
     stock: 40,
     sizes: ["Standard", "Plus with Strap"],
     tint: "sand",
@@ -64,7 +64,7 @@ const STATIC_PRODUCTS: Record<string, Product> = {
     slug: "wireless-headphones",
     description:
       "High-precision active noise cancellation, custom acoustic drivers, 30-hour battery life with quick fuel charging, and plush leatherette ear cushions.",
-    price_kes: 14500,
+    price_kes: 10,
     stock: 35,
     sizes: ["Midnight Black", "Sand Dune"],
     tint: "rose",
@@ -77,7 +77,7 @@ const STATIC_PRODUCTS: Record<string, Product> = {
     slug: "linen-shirt",
     description:
       "A breathable everyday shirt in washed linen. Relaxed fit, easy to layer.",
-    price_kes: 3200,
+    price_kes: 10,
     stock: 50,
     sizes: ["S", "M", "L", "XL"],
     tint: "sage",
@@ -89,7 +89,7 @@ const STATIC_PRODUCTS: Record<string, Product> = {
     name: "Ceramic mug",
     slug: "ceramic-mug",
     description: "Hand-thrown ceramic mug. Holds 300ml. Dishwasher safe.",
-    price_kes: 950,
+    price_kes: 10,
     stock: 100,
     sizes: ["One size"],
     tint: "sand",
@@ -101,7 +101,7 @@ const STATIC_PRODUCTS: Record<string, Product> = {
     name: "Canvas tote",
     slug: "canvas-tote",
     description: "Heavy-duty canvas tote bag. 15L capacity. Inside zip pocket.",
-    price_kes: 1800,
+    price_kes: 10,
     stock: 75,
     sizes: ["One size"],
     tint: "sky",
@@ -114,7 +114,7 @@ const STATIC_PRODUCTS: Record<string, Product> = {
     slug: "desk-lamp",
     description:
       "Minimalist LED desk lamp with 3 colour temperatures. USB-C powered.",
-    price_kes: 4500,
+    price_kes: 10,
     stock: 30,
     sizes: ["One size"],
     tint: "rose",

@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { sendOrderNotification } from "@/lib/notifications";
 
-const DELIVERY_KES = 250;
+const DELIVERY_KES = 0; // Set to 0 for testing (was 250)
 const DEFAULT_USER_PHONE = "0799608845";
 
 /** Normalise phone to international E.164 format with '+' for Paystack (+254XXXXXXXXX) */
