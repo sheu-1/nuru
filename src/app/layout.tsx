@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Instrument_Serif } from "next/font/google";
 import "./globals.css";
+import Splash from "@/components/Splash/Splash";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -26,8 +27,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${instrumentSerif.variable}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${inter.variable} ${instrumentSerif.variable}`}
+    >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(sessionStorage.getItem("nuru:splash-seen")||localStorage.getItem("nuru:splash-seen"))document.documentElement.dataset.splash="skip"}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="bg-bg text-ink min-h-screen">
+        <Splash />
         {children}
       </body>
     </html>

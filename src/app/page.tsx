@@ -3,7 +3,6 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { ShopFilters } from "@/components/ShopFilters";
-import { SplashScreen } from "@/components/SplashScreen";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import Link from "next/link";
 
@@ -188,7 +187,6 @@ export default async function HomePage({
 
   return (
     <div className="bg-bg min-h-screen">
-      <SplashScreen />
       <Header activePage="shop" />
 
       {/* Products & Filters Section */}

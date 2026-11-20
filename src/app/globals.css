@@ -35,3 +35,9 @@ a {
   text-decoration: none;
   color: inherit;
 }
+
+/* Returning visitors: splash hidden before first paint */
+html[data-splash="skip"] [data-splash-overlay] {
+  display: none !important;
+}
+
