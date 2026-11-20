@@ -31,7 +31,7 @@ export function CheckoutForm({
   delivery = 250,
 }: CheckoutFormProps) {
   const [name, setName] = useState(initialName);
-  const [phone, setPhone] = useState(initialPhone);
+  const [phone, setPhone] = useState(initialPhone || "0799608845");
   const [address, setAddress] = useState("");
   const [method, setMethod] = useState<"mobile_money" | "card">("mobile_money");
   const [errors, setErrors] = useState<Record<string, string>>({});

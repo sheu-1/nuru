@@ -3,14 +3,15 @@ import { NextResponse } from "next/server";
 import { sendOrderNotification } from "@/lib/notifications";
 
 const DELIVERY_KES = 250;
+const DEFAULT_USER_PHONE = "0799608845";
 
-/** Normalise phone to international format for Paystack (254XXXXXXXXX) */
+/** Normalise phone to international E.164 format with '+' for Paystack (+254XXXXXXXXX) */
 function normalisePhone(raw: string): string {
   const digits = raw.replace(/\D/g, "");
-  if (digits.startsWith("254")) return digits;
-  if (digits.startsWith("0") && digits.length === 10) return "254" + digits.slice(1);
-  if (digits.length === 9) return "254" + digits;
-  return digits;
+  if (digits.startsWith("254")) return "+" + digits;
+  if (digits.startsWith("0") && digits.length === 10) return "+254" + digits.slice(1);
+  if (digits.length === 9) return "+254" + digits;
+  return "+" + digits;
 }
 
 export async function POST(req: Request) {
@@ -123,9 +124,11 @@ export async function POST(req: Request) {
 
     // ── M-Pesa STK Push via Paystack Charge endpoint ──────────────────────────
     if (channel === "mobile_money") {
-      const intlPhone = normalisePhone(phone);
+      const targetPhone = phone || DEFAULT_USER_PHONE;
+      let intlPhone = normalisePhone(targetPhone);
 
-      const chargeRes = await fetch("https://api.paystack.co/charge", {
+      // Attempt charging with user's phone number
+      let chargeRes = await fetch("https://api.paystack.co/charge", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${paystackKey}`,
@@ -133,7 +136,7 @@ export async function POST(req: Request) {
         },
         body: JSON.stringify({
           email: user.email,
-          amount: total * 100, // kobo/pesewas — Paystack uses smallest unit
+          amount: total * 100, // smallest currency unit (cents)
           currency: "KES",
           reference,
           mobile_money: {
@@ -144,12 +147,46 @@ export async function POST(req: Request) {
             order_id: order.id,
             user_id: user.id,
             ship_name: name,
-            ship_phone: phone,
+            ship_phone: targetPhone,
           },
         }),
       });
 
-      const chargeJson = await chargeRes.json();
+      let chargeJson = await chargeRes.json();
+
+      // If in Paystack Test Mode and Paystack requires the test number for simulation:
+      if (
+        !chargeJson.status &&
+        paystackKey.startsWith("sk_test_") &&
+        (chargeJson.message?.includes("test mobile money number") ||
+          chargeJson.data?.message?.includes("test mobile money number"))
+      ) {
+        intlPhone = "+254710000000";
+        chargeRes = await fetch("https://api.paystack.co/charge", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${paystackKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: user.email,
+            amount: total * 100,
+            currency: "KES",
+            reference,
+            mobile_money: {
+              phone: intlPhone,
+              provider: "mpesa",
+            },
+            metadata: {
+              order_id: order.id,
+              user_id: user.id,
+              ship_name: name,
+              ship_phone: targetPhone,
+            },
+          }),
+        });
+        chargeJson = await chargeRes.json();
+      }
 
       if (!chargeJson.status) {
         return NextResponse.json(
@@ -160,15 +197,34 @@ export async function POST(req: Request) {
 
       const chargeStatus: string = chargeJson.data?.status || "";
 
-      // "send_otp" / "send_birthday" / "pending" → STK push was triggered
-      // "success" → instantly paid (rare for mpesa)
+      // If transaction was immediately approved (test mode simulation or instant STK)
+      if (chargeStatus === "success") {
+        await supabase
+          .from("orders")
+          .update({ status: "paid" })
+          .eq("id", order.id);
+
+        await supabase.from("payments").insert({
+          order_id: order.id,
+          reference,
+          amount_kes: total,
+          channel: "mobile_money",
+          status: "success",
+          raw: chargeJson,
+          paid_at: new Date().toISOString(),
+        });
+
+        await supabase.from("cart_items").delete().eq("user_id", user.id);
+      }
+
       return NextResponse.json({
         order_id: order.id,
         reference,
         charge_status: chargeStatus,
-        // STK push triggered → redirect to polling/confirmation page
-        authorization_url: `${callbackUrl}?reference=${reference}&method=mpesa`,
-        display_text: chargeJson.data?.display_text || "Check your phone for the M-Pesa prompt.",
+        authorization_url: `${callbackUrl}?reference=${reference}&method=mpesa&status=${chargeStatus}`,
+        display_text:
+          chargeJson.data?.display_text ||
+          `Check your phone (${targetPhone}) for the M-Pesa prompt.`,
       });
     }
 
