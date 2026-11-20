@@ -110,7 +110,24 @@ export async function POST(req: Request) {
 
     const rawKey = process.env.PAYSTACK_SECRET_KEY || "";
     const paystackKey = rawKey.trim().replace(/^["']|["']$/g, "");
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+    // Dynamically derive siteUrl from request headers so wrong env vars never cause 404
+    const originHeader = req.headers.get("origin");
+    const hostHeader = req.headers.get("host");
+    const envUrl = process.env.NEXT_PUBLIC_SITE_URL;
+    let siteUrl = "";
+
+    if (originHeader && !originHeader.includes("your-project.vercel.app")) {
+      siteUrl = originHeader;
+    } else if (hostHeader && !hostHeader.includes("your-project.vercel.app")) {
+      const proto = req.headers.get("x-forwarded-proto") || (hostHeader.includes("localhost") ? "http" : "https");
+      siteUrl = `${proto}://${hostHeader}`;
+    } else if (envUrl && !envUrl.includes("your-project.vercel.app")) {
+      siteUrl = envUrl;
+    } else {
+      siteUrl = "https://nuru-weld.vercel.app";
+    }
+
     const callbackUrl = `${siteUrl}/orders/${order.id}/confirmed`;
 
     if (paystackKey.startsWith("pk_")) {
@@ -123,13 +140,18 @@ export async function POST(req: Request) {
       );
     }
 
-    if (
-      !paystackKey ||
-      paystackKey.includes("sk_test_xxx") ||
-      paystackKey.includes("REPLACE_WITH_YOUR_LIVE_SECRET_KEY") ||
-      paystackKey === "your_paystack_secret_key"
-    ) {
-      // Dev mode: skip Paystack, go straight to simulated confirmation
+    if (paystackKey.includes("REPLACE_WITH_YOUR_LIVE_SECRET_KEY")) {
+      return NextResponse.json(
+        {
+          error:
+            "Incomplete Paystack Setup: Please replace the placeholder PAYSTACK_SECRET_KEY in Vercel with your actual Secret Key (e.g. sk_test_17ff0ab99b62dae88fab936ca29c13ddaecc6fd7 or your sk_live_... key).",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (!paystackKey || paystackKey.includes("sk_test_xxx") || paystackKey === "your_paystack_secret_key") {
+      // Dev fallback only when no key at all
       return NextResponse.json({
         authorization_url: `${callbackUrl}?reference=${reference}&simulated=true`,
         reference,
