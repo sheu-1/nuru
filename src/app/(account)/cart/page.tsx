@@ -103,9 +103,9 @@ export default async function CartPage() {
             <SummaryCard subtotal={subtotal} delivery={250}>
               <Link
                 href="/checkout"
-                className="h-14 rounded-full bg-brand text-white text-base font-medium flex items-center justify-center hover:opacity-90 transition-opacity text-center shadow-sm"
+                className="h-14 rounded-full bg-brand text-white text-base font-semibold flex items-center justify-center hover:opacity-90 transition-opacity text-center shadow-sm"
               >
-                Checkout
+                Proceed to checkout →
               </Link>
             </SummaryCard>
           </div>

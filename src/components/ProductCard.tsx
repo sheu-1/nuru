@@ -81,6 +81,14 @@ export function ProductCard({
             {description}
           </p>
         )}
+        <div className="mt-2 pt-1 flex items-center justify-between">
+          <span className="text-xs font-semibold text-brand group-hover:underline flex items-center gap-1">
+            Proceed to checkout →
+          </span>
+          <span className="h-8 px-3.5 rounded-full bg-surface text-xs font-medium text-ink flex items-center border border-line group-hover:bg-brand group-hover:text-white transition-colors">
+            Order
+          </span>
+        </div>
       </div>
     </Link>
   );

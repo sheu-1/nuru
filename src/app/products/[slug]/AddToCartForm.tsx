@@ -35,6 +35,22 @@ export function AddToCartForm({ productId, sizes, stock }: AddToCartFormProps) {
     });
   }
 
+  function handleProceedToCheckout() {
+    setErrorMsg(null);
+    startTransition(async () => {
+      const res = await addToCart(productId, selectedSize);
+      if (res?.error) {
+        if (res.error === "REDIRECT_SIGNIN") {
+          router.push(`/sign-in?redirectTo=/checkout`);
+        } else {
+          setErrorMsg(res.error);
+        }
+      } else {
+        router.push("/checkout");
+      }
+    });
+  }
+
   if (stock <= 0) {
     return (
       <div className="flex flex-col gap-4">
@@ -78,21 +94,32 @@ export function AddToCartForm({ productId, sizes, stock }: AddToCartFormProps) {
 
       {errorMsg && <p className="text-sm text-red-600 m-0">{errorMsg}</p>}
 
-      <div className="flex flex-wrap gap-3 max-w-[440px]">
+      <div className="flex flex-col gap-3 max-w-[440px]">
         <button
           type="button"
-          onClick={handleAddToCart}
+          onClick={handleProceedToCheckout}
           disabled={isPending}
-          className="flex-[1_1_200px] h-14 rounded-full bg-brand text-white text-base font-medium flex items-center justify-center hover:opacity-90 transition-opacity disabled:opacity-60 cursor-pointer shadow-sm"
+          className="h-14 rounded-full bg-brand text-white text-base font-semibold flex items-center justify-center hover:opacity-90 transition-opacity disabled:opacity-60 cursor-pointer shadow-sm w-full"
         >
-          {isPending ? "Adding…" : "Add to cart"}
+          {isPending ? "Processing…" : "Proceed to Checkout →"}
         </button>
-        <Link
-          href="/"
-          className="flex-[1_1_140px] h-14 rounded-full border border-line bg-transparent text-ink text-base font-medium flex items-center justify-center hover:bg-surface transition-colors text-center"
-        >
-          Keep browsing
-        </Link>
+
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={isPending}
+            className="flex-1 h-12 rounded-full border border-line bg-surface text-ink text-sm font-medium flex items-center justify-center hover:bg-[#E5E2DA] transition-colors cursor-pointer"
+          >
+            {isPending ? "Adding…" : "Add to cart"}
+          </button>
+          <Link
+            href="/"
+            className="flex-1 h-12 rounded-full border border-line bg-transparent text-ink text-sm font-medium flex items-center justify-center hover:bg-surface transition-colors text-center"
+          >
+            Keep browsing
+          </Link>
+        </div>
       </div>
     </div>
   );
