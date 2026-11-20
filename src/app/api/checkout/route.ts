@@ -108,11 +108,27 @@ export async function POST(req: Request) {
       status: "pending",
     }).catch(console.error);
 
-    const paystackKey = process.env.PAYSTACK_SECRET_KEY;
+    const rawKey = process.env.PAYSTACK_SECRET_KEY || "";
+    const paystackKey = rawKey.trim().replace(/^["']|["']$/g, "");
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
     const callbackUrl = `${siteUrl}/orders/${order.id}/confirmed`;
 
-    if (!paystackKey || paystackKey.includes("sk_test_xxx") || paystackKey === "your_paystack_secret_key") {
+    if (paystackKey.startsWith("pk_")) {
+      return NextResponse.json(
+        {
+          error:
+            "Configuration Error: A Public Key ('pk_...') was set for PAYSTACK_SECRET_KEY. In Vercel Environment Variables, set PAYSTACK_SECRET_KEY to your Secret Key (starts with 'sk_live_' or 'sk_test_').",
+        },
+        { status: 500 }
+      );
+    }
+
+    if (
+      !paystackKey ||
+      paystackKey.includes("sk_test_xxx") ||
+      paystackKey.includes("REPLACE_WITH_YOUR_LIVE_SECRET_KEY") ||
+      paystackKey === "your_paystack_secret_key"
+    ) {
       // Dev mode: skip Paystack, go straight to simulated confirmation
       return NextResponse.json({
         authorization_url: `${callbackUrl}?reference=${reference}&simulated=true`,
@@ -189,10 +205,11 @@ export async function POST(req: Request) {
       }
 
       if (!chargeJson.status) {
-        return NextResponse.json(
-          { error: chargeJson.message || "M-Pesa charge initialisation failed." },
-          { status: 502 }
-        );
+        const errorMsg =
+          chargeJson.message === "Invalid key"
+            ? "Paystack rejected your key ('Invalid key'). In Vercel, ensure PAYSTACK_SECRET_KEY is your Secret Key (starts with 'sk_live_' or 'sk_test_'), not the Public Key ('pk_...')."
+            : chargeJson.message || "M-Pesa charge initialisation failed.";
+        return NextResponse.json({ error: errorMsg }, { status: 502 });
       }
 
       const chargeStatus: string = chargeJson.data?.status || "";
@@ -253,8 +270,12 @@ export async function POST(req: Request) {
 
     const paystackJson = await paystackRes.json();
     if (!paystackJson.status) {
+      const errorMsg =
+        paystackJson.message === "Invalid key"
+          ? "Paystack rejected your key ('Invalid key'). In Vercel, ensure PAYSTACK_SECRET_KEY is your Secret Key (starts with 'sk_live_' or 'sk_test_'), not the Public Key ('pk_...')."
+          : paystackJson.message || "Paystack initialization error";
       return NextResponse.json(
-        { error: paystackJson.message || "Paystack initialization error" },
+        { error: errorMsg },
         { status: 502 }
       );
     }
