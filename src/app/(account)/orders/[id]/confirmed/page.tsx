@@ -54,6 +54,51 @@ export default async function OrderConfirmedPage({
     order = data as unknown as OrderDetail;
   }
 
+  // If redirected from Paystack with a reference and order is still pending, verify immediately
+  const reference = resolvedSearchParams.reference;
+  const paystackKey = process.env.PAYSTACK_SECRET_KEY;
+
+  if (reference && paystackKey && (!order || order.status === "pending")) {
+    try {
+      const verifyRes = await fetch(
+        `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${paystackKey}`,
+          },
+          cache: "no-store",
+        }
+      );
+      const verifyJson = await verifyRes.json();
+
+      if (verifyJson.status && verifyJson.data?.status === "success") {
+        await supabase
+          .from("orders")
+          .update({ status: "paid" })
+          .eq("id", id);
+
+        await supabase.from("payments").insert({
+          order_id: id,
+          reference,
+          amount_kes: Math.round(verifyJson.data.amount / 100),
+          channel: verifyJson.data.channel || "card",
+          status: "success",
+          raw: verifyJson.data,
+          paid_at: verifyJson.data.paid_at || new Date().toISOString(),
+        });
+
+        await supabase.from("cart_items").delete().eq("user_id", user.id);
+
+        if (order) {
+          order.status = "paid";
+          order.payments = [{ channel: verifyJson.data.channel || "card" }];
+        }
+      }
+    } catch (e) {
+      console.error("Paystack server-side verify error:", e);
+    }
+  }
+
   const isPending = !order || order.status === "pending";
   const channel = order?.payments?.[0]?.channel || "mobile_money";
   const paymentMethod = channel === "mobile_money" ? "M-Pesa" : channel.toUpperCase();

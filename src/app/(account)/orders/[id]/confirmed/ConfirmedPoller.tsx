@@ -49,6 +49,30 @@ export function ConfirmedPoller({
     let isSubscribed = true;
 
     async function checkStatus() {
+      // 1. If reference is in URL, attempt verification with Paystack backend
+      const urlParams = new URLSearchParams(window.location.search);
+      const ref = urlParams.get("reference") || urlParams.get("trxref");
+      if (ref) {
+        try {
+          const verifyRes = await fetch(
+            `/api/checkout/verify?reference=${encodeURIComponent(ref)}&orderId=${encodeURIComponent(orderId)}`
+          );
+          const verifyData = await verifyRes.json();
+          if (verifyData.status === "paid" && isSubscribed) {
+            setStatus("paid");
+            if (verifyData.order_no) setOrderNo(verifyData.order_no);
+            if (verifyData.amount_kes) setTotal(verifyData.amount_kes);
+            if (verifyData.channel) {
+              setMethod(verifyData.channel === "mobile_money" ? "M-Pesa" : verifyData.channel.toUpperCase());
+            }
+            router.refresh();
+            return;
+          }
+        } catch {
+          // Continue to fallback supabase check
+        }
+      }
+
       const { data } = await supabase
         .from("orders")
         .select(`
