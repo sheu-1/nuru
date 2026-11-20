@@ -1,4 +1,5 @@
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { ContactForm } from "./ContactForm";
 
 export default function ContactPage() {
@@ -27,9 +28,12 @@ export default function ContactPage() {
                 <span className="text-xs uppercase tracking-wider font-semibold text-muted">
                   Customer Support
                 </span>
-                <span className="text-lg font-medium text-ink">
-                  hello@nuru.ke
-                </span>
+                <a
+                  href="mailto:iannjore@gmail.com"
+                  className="text-lg font-medium text-ink hover:text-brand transition-colors"
+                >
+                  iannjore@gmail.com
+                </a>
                 <span className="text-sm text-muted">
                   We typically reply within 2 hours.
                 </span>
@@ -41,11 +45,14 @@ export default function ContactPage() {
                 <span className="text-xs uppercase tracking-wider font-semibold text-muted">
                   Phone & WhatsApp
                 </span>
-                <span className="text-lg font-medium text-ink">
-                  +254 700 123 456
-                </span>
+                <a
+                  href="tel:0799482396"
+                  className="text-lg font-medium text-ink hover:text-brand transition-colors"
+                >
+                  +254 799 482 396
+                </a>
                 <span className="text-sm text-muted">
-                  Mon – Sat, 9:00 AM – 6:00 PM EAT
+                  Call or WhatsApp: Mon – Sat, 9:00 AM – 6:00 PM EAT
                 </span>
               </div>
 
@@ -56,10 +63,10 @@ export default function ContactPage() {
                   Store & Fulfillment Center
                 </span>
                 <span className="text-lg font-medium text-ink">
-                  Westlands Commercial Hub
+                  Donholm
                 </span>
                 <span className="text-sm text-muted">
-                  Waiyaki Way, Nairobi, Kenya
+                  Donholm, Nairobi, Kenya
                 </span>
               </div>
             </div>
@@ -71,10 +78,10 @@ export default function ContactPage() {
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-sm font-semibold text-ink">
-                  Prompt Delivery Across Kenya
+                  Fast Delivery Across Kenya
                 </span>
                 <p className="text-xs text-muted m-0 leading-relaxed">
-                  Same-day delivery in Nairobi. Next-day countrywide courier delivery to Mombasa, Kisumu, Nakuru, and all major towns.
+                  Fast courier delivery within Nairobi, Donholm, and nationwide to Mombasa, Kisumu, Nakuru, and all major towns.
                 </p>
               </div>
             </div>
@@ -89,6 +96,7 @@ export default function ContactPage() {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

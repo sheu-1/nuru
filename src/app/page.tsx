@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { ShopFilters } from "@/components/ShopFilters";
 import { SplashScreen } from "@/components/SplashScreen";
@@ -245,6 +246,7 @@ export default async function HomePage({
           </div>
         )}
       </section>
+      <Footer />
     </div>
   );
 }
