@@ -108,7 +108,10 @@ export async function POST(req: Request) {
       status: "pending",
     }).catch(console.error);
 
-    const rawKey = process.env.PAYSTACK_SECRET_KEY || "";
+    const rawKey =
+      process.env.PAYSTACK_SECRET_KEY ||
+      process.env.EXPO_PUBLIC_PAYSTACK_SECRET_KEY ||
+      "";
     const paystackKey = rawKey.trim().replace(/^["']|["']$/g, "");
 
     // Dynamically derive siteUrl from request headers so wrong env vars never cause 404

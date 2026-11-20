@@ -12,7 +12,10 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Missing reference" }, { status: 400 });
     }
 
-    const rawKey = process.env.PAYSTACK_SECRET_KEY || "";
+    const rawKey =
+      process.env.PAYSTACK_SECRET_KEY ||
+      process.env.EXPO_PUBLIC_PAYSTACK_SECRET_KEY ||
+      "";
     const paystackKey = rawKey.trim().replace(/^["']|["']$/g, "");
     if (!paystackKey) {
       return NextResponse.json({ error: "Paystack secret key not configured" }, { status: 500 });
