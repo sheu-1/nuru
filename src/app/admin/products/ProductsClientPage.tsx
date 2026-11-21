@@ -365,33 +365,33 @@ export function ProductsClientPage({ initialProducts, categories }: Props) {
                           {/* Edit */}
                           <ActionBtn
                             onClick={() => openEdit(product)}
-                            color="#17160f"
-                            border="#d1cfc8"
-                            bg="#fff"
+                            color="#fff"
+                            border="#374151"
+                            bg="#374151"
                           >
-                            Edit
+                            ✏ Edit
                           </ActionBtn>
 
                           {/* Toggle stock */}
                           <ActionBtn
                             onClick={() => handleToggleStock(product)}
                             loading={loadingId === product.id}
-                            color={isOOS ? "#15803d" : "#b45309"}
-                            border={isOOS ? "#bbf7d0" : "#fde68a"}
-                            bg={isOOS ? "#f0fdf4" : "#fffbeb"}
+                            color="#fff"
+                            border={isOOS ? "#16a34a" : "#d97706"}
+                            bg={isOOS ? "#16a34a" : "#d97706"}
                           >
-                            {loadingId === product.id ? "…" : isOOS ? "Restock" : "Mark OOS"}
+                            {loadingId === product.id ? "…" : isOOS ? "✓ Restock" : "⊘ OOS"}
                           </ActionBtn>
 
                           {/* Toggle visibility */}
                           <ActionBtn
                             onClick={() => handleToggleActive(product)}
                             loading={loadingId === product.id + "_active"}
-                            color={product.is_active ? "#6b7280" : "#1d4ed8"}
-                            border={product.is_active ? "#e5e7eb" : "#bfdbfe"}
-                            bg={product.is_active ? "#f9fafb" : "#eff6ff"}
+                            color="#fff"
+                            border={product.is_active ? "#6b7280" : "#2563eb"}
+                            bg={product.is_active ? "#6b7280" : "#2563eb"}
                           >
-                            {loadingId === product.id + "_active" ? "…" : product.is_active ? "Hide" : "Show"}
+                            {loadingId === product.id + "_active" ? "…" : product.is_active ? "◉ Hide" : "◎ Show"}
                           </ActionBtn>
 
                           {/* Delete */}
@@ -404,13 +404,13 @@ export function ProductsClientPage({ initialProducts, categories }: Props) {
                                 border="#dc2626"
                                 bg="#dc2626"
                               >
-                                {loadingId === product.id + "_delete" ? "…" : "Confirm"}
+                                {loadingId === product.id + "_delete" ? "…" : "⚠ Confirm"}
                               </ActionBtn>
                               <ActionBtn
                                 onClick={() => setConfirmDeleteId(null)}
-                                color="#6b6a63"
-                                border="#e8e6df"
-                                bg="#fff"
+                                color="#374151"
+                                border="#d1d5db"
+                                bg="#f3f4f6"
                               >
                                 Cancel
                               </ActionBtn>
@@ -418,11 +418,11 @@ export function ProductsClientPage({ initialProducts, categories }: Props) {
                           ) : (
                             <ActionBtn
                               onClick={() => setConfirmDeleteId(product.id)}
-                              color="#dc2626"
-                              border="#fecaca"
-                              bg="#fff5f5"
+                              color="#fff"
+                              border="#dc2626"
+                              bg="#dc2626"
                             >
-                              Delete
+                              🗑 Delete
                             </ActionBtn>
                           )}
                         </div>
