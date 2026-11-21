@@ -124,7 +124,7 @@ export function ShopFilters({
               href={href}
               style={
                 isActive
-                  ? { background: "#100F09", color: "#FFFFFF", fontWeight: 600 }
+                  ? { background: "#1f5e4a", color: "#ffffff", fontWeight: 600, border: "none" }
                   : {}
               }
               className={`h-10 px-5 rounded-full text-sm font-medium flex items-center flex-none transition-all cursor-pointer ${

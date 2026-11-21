@@ -13,9 +13,10 @@ export function AdminNav() {
     <nav className="flex items-center gap-2 sm:gap-4 text-sm font-medium">
       <Link
         href="/admin/orders"
+        style={isOrders ? { background: "#1f5e4a", color: "#ffffff", fontWeight: 600 } : {}}
         className={`px-3.5 py-1.5 rounded-full transition-colors ${
           isOrders
-            ? "bg-ink text-white font-semibold"
+            ? ""
             : "text-muted hover:text-ink hover:bg-surface"
         }`}
       >
@@ -23,9 +24,10 @@ export function AdminNav() {
       </Link>
       <Link
         href="/admin/products"
+        style={isProducts ? { background: "#1f5e4a", color: "#ffffff", fontWeight: 600 } : {}}
         className={`px-3.5 py-1.5 rounded-full transition-colors ${
           isProducts
-            ? "bg-ink text-white font-semibold"
+            ? ""
             : "text-muted hover:text-ink hover:bg-surface"
         }`}
       >
