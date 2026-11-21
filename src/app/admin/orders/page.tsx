@@ -181,9 +181,10 @@ export default async function AdminOrdersPage({
             <Link
               key={tab.value}
               href={href}
+              style={isActive ? { background: "#1f5e4a", color: "#ffffff" } : {}}
               className={`h-9 px-4 rounded-full text-xs font-medium flex items-center transition-colors ${
                 isActive
-                  ? "bg-ink text-white"
+                  ? ""
                   : "bg-surface text-ink hover:bg-[#EAE7DC]"
               }`}
             >
