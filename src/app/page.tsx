@@ -12,6 +12,7 @@ interface Product {
   slug: string;
   description: string;
   price_kes: number;
+  stock?: number;
   image_url?: string | null;
   tint?: string | null;
   category_slug?: string;
@@ -144,7 +145,7 @@ export default async function HomePage({
 
       let query = supabase
         .from("products")
-        .select("id, name, slug, description, price_kes, image_url, tint, category_id, is_active, categories(slug)")
+        .select("id, name, slug, description, price_kes, stock, image_url, tint, category_id, is_active, categories(slug)")
         .eq("is_active", true)
         .order("created_at", { ascending: false });
 
@@ -237,6 +238,7 @@ export default async function HomePage({
                 name={product.name}
                 description={product.description}
                 price_kes={product.price_kes}
+                stock={product.stock}
                 image_url={product.image_url}
                 tint={product.tint}
               />

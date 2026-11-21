@@ -8,6 +8,7 @@ interface ProductCardProps {
   description?: string | null;
   image_url?: string | null;
   tint?: string | null;
+  stock?: number;
 }
 
 const TINTS: Record<string, { bg: string; shapeBg: string; shapeClass: string }> = {
@@ -40,8 +41,10 @@ export function ProductCard({
   description,
   image_url,
   tint = "sage",
+  stock,
 }: ProductCardProps) {
   const tintConfig = (tint && TINTS[tint]) || TINTS.sage;
+  const isOOS = typeof stock === "number" && stock === 0;
 
   return (
     <Link
@@ -58,13 +61,31 @@ export function ProductCard({
             alt={name}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-            className="object-cover transition-transform group-hover:scale-105 duration-300"
+            className={`object-cover transition-transform group-hover:scale-105 duration-300 ${isOOS ? "opacity-50 grayscale" : ""}`}
           />
         ) : (
           <div
-            className={`absolute ${tintConfig.shapeClass}`}
+            className={`absolute ${tintConfig.shapeClass} ${isOOS ? "opacity-40" : ""}`}
             style={{ backgroundColor: tintConfig.shapeBg }}
           />
+        )}
+        {isOOS && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span
+              style={{
+                background: "rgba(23,22,15,0.75)",
+                color: "#fff",
+                fontSize: 12,
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                padding: "6px 16px",
+                borderRadius: 20,
+                textTransform: "uppercase",
+              }}
+            >
+              Out of Stock
+            </span>
+          </div>
         )}
       </div>
       <div className="flex flex-col gap-1">
@@ -82,11 +103,21 @@ export function ProductCard({
           </p>
         )}
         <div className="mt-2 pt-1 flex items-center justify-between">
-          <span className="text-xs font-semibold text-brand group-hover:underline flex items-center gap-1">
-            Proceed to checkout →
-          </span>
-          <span className="h-8 px-3.5 rounded-full bg-surface text-xs font-medium text-ink flex items-center border border-line group-hover:bg-brand group-hover:text-white transition-colors">
-            Order
+          {isOOS ? (
+            <span className="text-xs font-medium text-muted">Currently unavailable</span>
+          ) : (
+            <span className="text-xs font-semibold text-brand group-hover:underline flex items-center gap-1">
+              Proceed to checkout →
+            </span>
+          )}
+          <span
+            className={`h-8 px-3.5 rounded-full text-xs font-medium flex items-center border transition-colors ${
+              isOOS
+                ? "bg-surface text-muted border-line cursor-not-allowed"
+                : "bg-surface text-ink border-line group-hover:bg-brand group-hover:text-white"
+            }`}
+          >
+            {isOOS ? "Unavailable" : "Order"}
           </span>
         </div>
       </div>
